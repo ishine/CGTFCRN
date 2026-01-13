@@ -1,0 +1,12 @@
+einops==0.7.0
+librosa==0.10.1
+numpy==1.24.4
+pandas==2.0.3
+pesq==0.0.4
+ptflops==0.7
+pystoi==0.4.1
+soundfile==0.12.1
+toml==0.10.2
+torch==1.11.0
+torch_stoi==0.1.2
+tqdm==4.65.0
