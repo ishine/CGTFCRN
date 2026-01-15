@@ -2,9 +2,11 @@ import torch
 import numpy as np
 import torch.nn as nn
 from einops import rearrange
-from ncps.torch import CfC, LTC
+from ncps.torch import CfC
 
 RNN_TYPE = "GRU"
+bCrossOver = True
+layerCnt = 4
 class ERB(nn.Module):
     def __init__(self, erb_subband_1, erb_subband_2, nfft=512, high_lim=8000, fs=16000):
         super().__init__()
@@ -512,16 +514,75 @@ class DPGRNN_LSTM(nn.Module):
 class Encoder(nn.Module):
     def __init__(self):
         super().__init__()
-
-        self.en_convs = nn.ModuleList([
-            ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
-            ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
-            # TFCM(16, (3, 3), bDecConv=False),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False, bLastLayer=True)
-        ])
+        if layerCnt == 8:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(6, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(7, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(8, 1), use_deconv=False, bLastLayer=True)
+            ])
+        elif layerCnt == 7:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(6, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(7, 1), use_deconv=False, bLastLayer=True)
+            ])
+        elif layerCnt == 6:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(6, 1), use_deconv=False, bLastLayer=True)
+            ])
+        elif layerCnt == 5:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False, bLastLayer=True)
+            ])
+        elif layerCnt == 4:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(5, 1), use_deconv=False, bLastLayer=True)
+            ])
+        elif layerCnt == 3:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False, bLastLayer=True)
+            ])
 
     def forward(self, x):
         en_outs = []
@@ -534,15 +595,79 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
-        self.de_convs = nn.ModuleList([
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
-            CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True, bLastLayer=True),
-            # TFCM(16, (3, 3), bDecConv=True),
-            ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
-            ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
-        ])
+        if layerCnt == 8:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 8, 1), dilation=(8, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 7, 1), dilation=(7, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 6, 1), dilation=(6, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
+                       bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        if layerCnt == 7:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 7, 1), dilation=(7, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 6, 1), dilation=(6, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
+                       bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        elif layerCnt == 6:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 6, 1), dilation=(6, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True, bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        elif layerCnt == 5:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True, bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        elif layerCnt == 4:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 5, 1), dilation=(5, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
+                       bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        elif layerCnt == 3:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
+                       bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
 
     def forward(self, x, en_outs):
         N_layers = len(self.de_convs)
